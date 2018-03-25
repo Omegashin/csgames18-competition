@@ -2,13 +2,18 @@ package com.mirego.csmapapplication.activity
 
 
 import android.content.Intent
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
+import android.widget.TextView
 import com.mirego.csmapapplication.MapPingApplication
 import com.mirego.csmapapplication.R
 import com.mirego.csmapapplication.fragment.ListSegmentFragment
@@ -21,13 +26,21 @@ import com.mirego.csmapapplication.service.GitHubService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.support.v7.widget.RecyclerView
+import com.mirego.csmapapplication.ListItemClass
+import java.util.ArrayList
 
+import RecyclerAdapter
+
+private var locationManager : LocationManager? = null
 
 class MainActivity : FragmentActivity() {
 
     private val listFragment = ListSegmentFragment()
     private val mapFragment = MapSegmentFragment()
+    private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private var selectedSegmentIndex = 0
+    internal var data: ArrayList<ListItemClass>? = null
 
     private lateinit var segmentButtons: List<ImageButton>
 
@@ -50,6 +63,31 @@ class MainActivity : FragmentActivity() {
         setupButtons()
 
         downloadData()
+
+        //location
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
+
+        //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+
+        viewAdapter = RecyclerAdapter()
+
+        val recyclerView = findViewById<RecyclerView>(R.id.itemListTest)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = viewAdapter
+
+    }
+
+    //define the listener
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+
+            //val textView: TextView = findViewById(R.id.test) as TextView
+
+            //textView.setText("" + location.longitude + ":" + location.latitude);
+        }
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
     }
 
     private fun downloadData() {
